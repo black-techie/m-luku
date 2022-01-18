@@ -36,7 +36,6 @@ int previous_length[4] = {0, 0, 0, 0};
 float Units = 0.01;
 
 void setup() {
-  Serial.begin(9600);
   lcd.begin(20, 4);
   pinMode(RedLed, OUTPUT);
   pinMode(buzzer, OUTPUT);
@@ -53,7 +52,7 @@ void setup() {
 }
 
 void loop() {
-  volatile float rem_units = Units - Energy;
+  volatile float rem_units = Units - Energy ;
   RunningStatistics inputStats;
   inputStats.setWindowSecs( windowLength );
   mA = ACS.mA_AC() - 79.65;
@@ -68,7 +67,6 @@ void loop() {
       break;
     }
   }
-
   homeScreen(Energy , current_Volts, rem_units);
 }
 
@@ -83,7 +81,7 @@ void homeScreen(double Energy_reading, float Vsensor, float units) {
   register String displayText[4] = {
     "M-LUKU",
     "Volt's : " + String(int(Vsensor)) + "v",
-    "Unit's : " + String(units) + "kW/h",
+    "Unit's : " + String(units = units <= 0 ? 0 : units) + "kW/h",
     "Energy : " + (String(Energy_reading)) + "kW/h",
   };
   bool clearScreen =  false;
@@ -105,10 +103,10 @@ void homeScreen(double Energy_reading, float Vsensor, float units) {
     digitalWrite( YellowLed , 1);
   }
   if ( units > 0 && units  < 5) {
-    digitalWrite(  GreenLed , 1);
-    digitalWrite( YellowLed , 0);
+    digitalWrite(  GreenLed , 0);
+    digitalWrite( YellowLed , 1);
   }
-  if (units <= 0) {
+  if (units == 0.00) {
     digitalWrite(  GreenLed , 0);
     digitalWrite( YellowLed , 0);
   }
@@ -136,5 +134,4 @@ void startScreen() {
 
 void calcurateEnergy (void) {
   Energy += (current_Volts * (mA / 1000) * 1) / 360000;
-  Serial.println(1);
 }
